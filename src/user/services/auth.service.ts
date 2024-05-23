@@ -21,7 +21,7 @@ export class AuthService {
       const payload = {
         username,
         role: userInDb.role,
-        companies: userInDb.auditedCompanies,
+        auditedCompanies: userInDb.auditedCompanies,
       };
 
       return {
