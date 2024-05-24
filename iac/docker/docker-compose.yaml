@@ -3,10 +3,6 @@ version: '3.8'
 services:
   jobchain-db:
     image: mongo
-    # volumes:
-    #   - type: bind
-    #     source: ../../data
-    #     target: /data/db
     container_name: jobchain-db
     ports:
       - 27018:27017
@@ -15,13 +11,13 @@ services:
 
   jobchain:
     container_name: jobchain
-    image: jobchain.1.1
+    image: jobchain:1.0.0
     build:
       context: ../../
-      # target: development
       dockerfile: ./iac/docker/Dockerfile
-    # command: npm run start:dev
-    command: node dist/main
+
+    env_file:
+      - .env.docker
     ports:
       - 3002:3000
       - 9228:9229
@@ -31,11 +27,10 @@ services:
       - ../../:/jobchain
       - /jobchain/node_modules
     restart: unless-stopped
+    command: node dist/main
+
     depends_on:
       - jobchain-db
-
-    # env_file:
-    #   - ../../iac/docker/.env.docker.dev
 
 networks:
   jobchain-network:

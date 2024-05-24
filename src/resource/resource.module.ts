@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CompanyMiddleware } from './middlewares';
+import { AuthMiddleware } from '@/shared';
 
 @Module({
   imports: [
@@ -27,6 +28,10 @@ import { CompanyMiddleware } from './middlewares';
 })
 export class ResourceModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(CompanyMiddleware).forRoutes('resources/audit');
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes(ResourceController)
+      .apply(CompanyMiddleware)
+      .forRoutes('resources/audit');
   }
 }

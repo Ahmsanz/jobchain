@@ -1,4 +1,5 @@
-import { UserModel, UserRole } from '@/user/types';
+import { RequestWithUser } from '@/shared/types';
+import { UserRole } from '@/user/types';
 import {
   BadRequestException,
   ForbiddenException,
@@ -8,11 +9,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
-
-interface RequestWithUser extends Request {
-  user: UserModel;
-}
+import { Response } from 'express';
 
 @Injectable()
 export class CompanyMiddleware implements NestMiddleware {
@@ -24,23 +21,14 @@ export class CompanyMiddleware implements NestMiddleware {
     next: (error?: Error) => void,
   ) {
     try {
-      const token = this.extractTokenFromHeader(req);
-      if (!token) {
-        throw new UnauthorizedException(
-          'You need permissions to reach this endpoint',
-        );
-      }
-      const user = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
       if (!req.query.company)
         throw new BadRequestException(
           'You must specify at least one company to check for this endpoint',
         );
       const queriedCompanies = (req.query.company as string).split(',');
-      const auditedCompanies = user.auditedCompanies;
+      const auditedCompanies = req.user.auditedCompanies;
 
-      if (user.role !== UserRole.admin) {
+      if (req.user.role !== UserRole.admin) {
         for (const company of queriedCompanies) {
           if (!auditedCompanies.includes(company)) {
             throw new ForbiddenException(
@@ -57,10 +45,5 @@ export class CompanyMiddleware implements NestMiddleware {
         throw new UnauthorizedException('token expired, please log in again');
       throw error;
     }
-  }
-
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
   }
 }

@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto } from '../dtos/login.dto';
 import { LoginRequest } from '../dtos/login.request';
 import { JwtService } from '@nestjs/jwt';
@@ -13,10 +18,15 @@ export class AuthService {
 
   async login(credentials: LoginRequest): Promise<LoginDto> {
     try {
-      const { username } = credentials;
+      const { username, password } = credentials;
       const userInDb = await this.userService.findUserByEmail(username);
 
       if (!userInDb) throw new NotFoundException('user does not exist');
+
+      if (userInDb.password !== password)
+        throw new UnauthorizedException(
+          'the provided credentials are wrong, please check the username or password',
+        );
 
       const payload = {
         username,

@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '../guards';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  Logger,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserRequest } from '../dtos';
 import { UserService } from '../services';
+import { RolesGuard } from '../guards';
+import { Roles } from '@/shared/decorators';
 
 @Controller('users')
 export class UserController {
@@ -9,12 +19,26 @@ export class UserController {
 
   @Post()
   async createUser(@Body() user: CreateUserRequest) {
-    return this.userService.createUser(user);
+    try {
+      return this.userService.createUser(user);
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(error.message, error.status);
+    }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(RolesGuard)
+  @Roles(['admin'])
   @Get('/:email')
   async getUserByEmail(@Param('email') email: string) {
-    return this.userService.findUserByEmail(email);
+    try {
+      const { password, ...user } =
+        await this.userService.findUserByEmail(email);
+
+      return user;
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(error.message, error.status);
+    }
   }
 }

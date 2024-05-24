@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpException, Logger, Post } from '@nestjs/common';
 import { LoginDto, LoginRequest } from '../dtos';
 import { AuthService } from '../services';
 
@@ -8,8 +8,13 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() credentials: LoginRequest): Promise<LoginDto> {
-    const response = await this.authService.login(credentials);
+    try {
+      const response = await this.authService.login(credentials);
 
-    return response;
+      return response;
+    } catch (error) {
+      Logger.error(error);
+      throw new HttpException(error.message, error.status);
+    }
   }
 }

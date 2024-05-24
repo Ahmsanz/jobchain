@@ -5,6 +5,7 @@ import type { Model } from 'mongoose';
 import { CreateUserRequest } from '../dtos/create-user.request';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UserDto } from '../dtos/user.dto';
+import { UserModel } from '../types';
 
 @Injectable()
 export class UserService {
@@ -27,15 +28,13 @@ export class UserService {
     }
   }
 
-  async findUserByEmail(email: string): Promise<UserDto> {
+  async findUserByEmail(email: string): Promise<UserModel> {
     try {
-      const userInDb = (
+      const { _id, ...userInDb } = (
         await this.userModel.findOne({ email }, { __v: 0 })
       ).toJSON();
 
-      const { _id, ...result } = userInDb;
-
-      return result;
+      return userInDb;
     } catch (error) {
       Logger.error(error);
       throw error;

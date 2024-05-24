@@ -1,2 +1,0 @@
-JWT_SECRET=jobchain_secret
-MONGO_URI=mongodb://jobchain-db/jobchain
