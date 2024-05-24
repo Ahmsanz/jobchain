@@ -27,4 +27,13 @@ export class ResourceService {
       throw error;
     }
   }
+
+  async getResourceById(resourceId: string): Promise<ResourceModel> {
+    try {
+      return this.resourceModel.findById(resourceId);
+    } catch (error) {
+      Logger.error(error);
+      throw error;
+    }
+  }
 }

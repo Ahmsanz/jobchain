@@ -8,12 +8,12 @@ import {
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
+import { ResourceService } from '../services';
 
 @Injectable()
 export class CompanyMiddleware implements NestMiddleware {
-  constructor(private jwtService: JwtService) {}
+  constructor(private readonly resourceService: ResourceService) {}
 
   async use(
     req: RequestWithUser,
@@ -21,19 +21,30 @@ export class CompanyMiddleware implements NestMiddleware {
     next: (error?: Error) => void,
   ) {
     try {
-      if (!req.query.company)
-        throw new BadRequestException(
-          'You must specify at least one company to check for this endpoint',
+      if (req.params.resourceId) {
+        const resource = await this.resourceService.getResourceById(
+          req.params.resourceId,
         );
-      const queriedCompanies = (req.query.company as string).split(',');
-      const auditedCompanies = req.user.auditedCompanies;
+        if (!req.user.auditedCompanies.includes(resource.company)) {
+          throw new ForbiddenException(
+            `You are not allowed to get this resource, since you are not an auditor for company ${resource.company}`,
+          );
+        }
+      } else {
+        if (!req.query.company)
+          throw new BadRequestException(
+            'You must specify at least one company to check for this endpoint',
+          );
+        const queriedCompanies = (req.query.company as string).split(',');
+        const auditedCompanies = req.user.auditedCompanies;
 
-      if (req.user.role !== UserRole.admin) {
-        for (const company of queriedCompanies) {
-          if (!auditedCompanies.includes(company)) {
-            throw new ForbiddenException(
-              `You're not allowed to get information from company ${company}`,
-            );
+        if (req.user.role !== UserRole.admin) {
+          for (const company of queriedCompanies) {
+            if (!auditedCompanies.includes(company)) {
+              throw new ForbiddenException(
+                `You're not allowed to get information from company ${company}`,
+              );
+            }
           }
         }
       }

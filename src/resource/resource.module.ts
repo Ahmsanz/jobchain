@@ -32,6 +32,7 @@ export class ResourceModule {
       .apply(AuthMiddleware)
       .forRoutes(ResourceController)
       .apply(CompanyMiddleware)
-      .forRoutes('resources/audit');
+      .exclude('resources')
+      .forRoutes(ResourceController);
   }
 }
