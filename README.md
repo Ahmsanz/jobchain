@@ -56,6 +56,9 @@ $ npm run mongo:load
 
 This will load into the mongo instance the necessary data with an admin user, an auditor, and the resources.
 
+#### ENV VARIABLES
+Please note that if you choose to run the app locally **you will need a .env file at the root**. You can copy the ones at iac/docker/.env.docker
+
 #### DATA
 
 - ADMIN USER:
