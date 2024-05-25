@@ -21,7 +21,9 @@ It exposes the resources belonging to a certain company. The access to said reso
 - Users can access the endpoints /resources/check and /resources/check/:resourceId to learn if they can retrieve information from a certain company or a certain resource, respectively. In the former, if no company is specified the response will include the allowed companies.
 - Admin users can access the endpoint /resources to get the whole list of resources.
 - Admin and auditors can access the endpoint /resources/audit to get the resources of one or more companies, given the query param _?company=_, with the companies names separated by commas (i.e.: ?company=Company X,Company Y, carefull with the spelling!)
-- Admin and auditors can access the endpoint /resources/audit/:resourceId to get a single resource
+- Admin and auditors can access the endpoint /resources/audit/:resourceId to get a single resource.
+
+**The routes /resources and /resources/audit admit also _limit_ and _page_ as query params, enabling pagination (i.e.: /resources/audit?limit=5&page=2).**
 
 ### Installation
 
