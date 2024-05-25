@@ -6,10 +6,18 @@ For the sake of simplification, it contains just two modules, User and Resource,
 
 #### USER MODULE
 
-The auth controller has a very simple authentication logic, allowing to get the jwt that will be used in the other requests.
+The auth controller has a very simple authentication logic, allowing to get the jwt that will be used in the other requests. It only exposes an endpoint, /auth/login, that will accept a username and password. Upon a successfull request, it will respond with a JWT that shall be injected in the authorization headers (Authorization: Bearer + JWT) on subsequent requests.
+
+```JSON
+{
+  "username": "adam.smith@mail.com",
+  "password": "audit"
+}
+```
+
 The user controller has two endpoints that allow to create users and to get the details of one of them passing their email (only if the authenticated user is an admin).
 
-It is possible to create a user without being authenticated. In order for the user to be able to interact with the Resource endpoints, two things must be taken into account:
+Creating a new user is the only request accessible without being authenticated. In order for the user to be able to interact with the Resource endpoints, two things must be taken into account:
 
 - The role must be either "admin" or "auditor".
 - The _auditedCompanies_ field is an array with the names of the companies which resources might be retrieved by a given user. The available companies are "Company X", "Company Y" and "Company Z", and _their names must be spelled correctly both in this field (upon creation) and in the query parameter *company* that some requests allow_.
@@ -59,6 +67,7 @@ $ npm run mongo:load
 This will load into the mongo instance the necessary data with an admin user, an auditor, and the resources.
 
 #### ENV VARIABLES
+
 Please note that if you choose to run the app locally **you will need a .env file at the root**. You can copy the ones at iac/docker/.env.docker
 
 #### DATA
