@@ -21,24 +21,23 @@ export class CompanyMiddleware implements NestMiddleware {
     next: (error?: Error) => void,
   ) {
     try {
-      if (req.params.resourceId) {
-        const resource = await this.resourceService.getResourceById(
-          req.params.resourceId,
-        );
-        if (!req.user.auditedCompanies.includes(resource.company)) {
-          throw new ForbiddenException(
-            `You are not allowed to get this resource, since you are not an auditor for company ${resource.company}`,
+      if (req.user.role !== UserRole.admin) {
+        if (req.params.resourceId) {
+          const resource = await this.resourceService.getResourceById(
+            req.params.resourceId,
           );
-        }
-      } else {
-        if (!req.query.company)
-          throw new BadRequestException(
-            'You must specify at least one company to check for this endpoint',
-          );
-        const queriedCompanies = (req.query.company as string).split(',');
-        const auditedCompanies = req.user.auditedCompanies;
-
-        if (req.user.role !== UserRole.admin) {
+          if (!req.user.auditedCompanies.includes(resource.company)) {
+            throw new ForbiddenException(
+              `You are not allowed to get this resource, since you are not an auditor for company ${resource.company}`,
+            );
+          }
+        } else {
+          if (!req.query.company)
+            throw new BadRequestException(
+              'You must specify at least one company to check for this endpoint',
+            );
+          const queriedCompanies = (req.query.company as string).split(',');
+          const auditedCompanies = req.user.auditedCompanies;
           for (const company of queriedCompanies) {
             if (!auditedCompanies.includes(company)) {
               throw new ForbiddenException(
