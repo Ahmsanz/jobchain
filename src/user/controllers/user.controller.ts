@@ -8,15 +8,21 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserRequest } from '../dtos';
+import { CreateUserDto, CreateUserRequest, UserDto } from '../dtos';
 import { UserService } from '../services';
 import { RolesGuard } from '../guards';
 import { Roles } from '@/shared/decorators';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @ApiResponse({
+    status: 201,
+    type: CreateUserDto,
+  })
   @Post()
   async createUser(@Body() user: CreateUserRequest) {
     try {
@@ -27,6 +33,11 @@ export class UserController {
     }
   }
 
+  @ApiBearerAuth('Bearer token')
+  @ApiResponse({
+    status: 200,
+    type: UserDto,
+  })
   @UseGuards(RolesGuard)
   @Roles(['admin'])
   @Get('/:email')
