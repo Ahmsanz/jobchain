@@ -102,11 +102,15 @@ Please note that if you choose to run the app locally **you will need a .env fil
 }
 ```
 
+#### API DOCUMENTATION
+
+A partial swagger documentation has been provided for the API using the module provided by NestJS. It can be checked at ${host}/api/ and used to try the available endpoints.
+
 ### NEXT STEPS
 
 For speed sake, thise little app does not include some improvements that should be taken into consideration:
 
-- **TESTING**: for lack of time, just the initial app.e2e-spec.ts is working. Unit, integration and e2e testing should be included as a fundamental way to ensure the robustness of the application. The latter, e2e tests, would be a great way to automatically check that the requirements are being met.
+- **TESTING**: Unit, integration and e2e testing should be included as a fundamental way to ensure the robustness of the application. Some e2e testshave been added as a way to automatically check that the stated requirements are being met.
 
 - **ARCHITECTURE**: this application is following in a sort of loose way the architecture suggested by NestJS, having modules and services, with the latter accessing directly to the models and thus the database. More sophisticated architectures could be applied, like DDD and Clean Architecture, that will tackle possible problems when the complexity increases.
 

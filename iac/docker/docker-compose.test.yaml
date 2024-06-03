@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  jobchain-db:
+    image: mongo
+    container_name: jobchain-db
+    ports:
+      - 27018:27017
+    command: mongod --quiet --logpath /dev/null
+    networks:
+      - jobchain-network
+
+  jobchain:
+    container_name: jobchain-test
+    image: jobchain-test:1.0.0
+    build:
+      context: ../../
+      dockerfile: ./iac/docker/Dockerfile.test
+
+    env_file:
+      - .env.docker.test
+    ports:
+      - 3003:3000
+      - 9228:9229
+    networks:
+      - jobchain-network
+    command: npm run test:e2e
+
+    depends_on:
+      - jobchain-db
+
+networks:
+  jobchain-network:
